@@ -1,36 +1,39 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Slidebook
 
-## Getting Started
+Веб-приложение для создания редактируемых презентаций по теме. Интерфейс вдохновлён исследовательским рабочим пространством NotebookLM; проект независим от Google.
 
-First, run the development server:
+## Возможности
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Четыре структуры: Research Overview, Deep Dive, Executive Summary и Study Guide.
+- 5–12 слайдов: титульный, три ключевые идеи, двухколоночный разбор, этапы/сравнение и вопросы с ответами.
+- Встроенная детерминированная генерация без регистрации и API-ключей. Тематические профили покрывают ИИ, образование, климат, космос, бизнес, биологию и историю. Для других тем создаётся явно обозначенная исследовательская рамка без вымышленных фактов.
+- Опциональная генерация через Gemini GenerateContent или OpenAI Responses API со структурированным JSON и проверкой результата.
+- Редактирование текста на слайде, три темы, локальное автосохранение, отмена последнего действия, экспорт и импорт JSON.
+- Полноэкранный показ со стрелками, пробелом, Home/End и Esc.
+- PDF через системную печать: отдельная страница 320 × 180 мм для каждого слайда.
+- Отдельное меню с инструкциями и официальными ссылками для получения API-ключей.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Стек и устройство
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Next.js 16 App Router, React 19, TypeScript, Tailwind CSS 4, Lucide. Node.js 24. База данных и серверные секреты не нужны.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+`components/workspace.tsx` управляет редактором. `components/slide-canvas.tsx` используется для редактора, миниатюр, показа и печати. `lib/generator.ts` создаёт локальный контент. `lib/llm.ts` выполняет запрос к выбранному провайдеру; `app/api/generate/route.ts` валидирует входные данные. Схема презентации и проверка импортируемых файлов находятся в `lib/types.ts`.
 
-## Learn More
+API-ключ существует только в памяти вкладки и передаётся серверу в теле запроса, затем выбранному провайдеру в заголовке авторизации. Приложение не сохраняет его в localStorage, JSON или логах. OpenAI-запросы используют `store: false`. Правила обработки данных самого провайдера применяются отдельно. Содержимое слайдов и тема сохраняются локально в браузере; очистка данных сайта удаляет автосохранение.
 
-To learn more about Next.js, take a look at the following resources:
+## Проверка
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `npm run build` — production-сборка и проверка TypeScript.
+- `npm run lint` — ESLint.
+- `npm test` — проверка всех комбинаций структур, тем и длины презентации, изоляции тематических профилей, контрактов обеих API-интеграций и обработки ошибок.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Контрактные API-тесты используют контролируемые ответы и не выполняют платных запросов. Проверка реального LLM-ответа требует действующего пользовательского ключа. Ошибка провайдера показывается пользователю; доступно явное переключение на встроенную генерацию.
 
-## Deploy on Vercel
+## Официальные источники для интеграций
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- [Gemini API: ключи](https://ai.google.dev/gemini-api/docs/api-key)
+- [Gemini: структурированные ответы](https://ai.google.dev/gemini-api/docs/generate-content/structured-output)
+- [OpenAI: структурированные ответы](https://developers.openai.com/api/docs/guides/structured-outputs)
+- [OpenAI API: начало работы](https://developers.openai.com/api/docs/quickstart)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Встроенный режим не обращается к интернету и не проверяет актуальность фактов. Он предназначен для создания первого содержательного черновика; точные данные и источники следует проверять перед публикацией.
