@@ -1,7 +1,6 @@
 import { Deck, Slide } from './types';
 export const VISUAL_RATIO = 0.6;
 export const TEXT_RATIO = 0.4;
-export const atlas = '/visuals/editorial-atlas.png';
 const domains = [
   { id: 'ai', match: /искусственн|нейросет|машинн|\bai\b|artificial|llm|gpt/i, name: 'Искусственный интеллект', x: 0, y: 0 },
   { id: 'education', match: /образован|обучени|педагог|учеб|education|learning|study/i, name: 'Обучение и развитие', x: 1, y: 0 },

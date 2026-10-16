@@ -1,8 +1,8 @@
 export const templates = [
-  { id: 'research', name: 'Visual Story', description: 'Иллюстрация на весь рост + история', icon: 'research', color: 'blue' },
-  { id: 'deep', name: 'Visual Explainer', description: 'Наглядная схема + короткое объяснение', icon: 'deep', color: 'purple' },
-  { id: 'executive', name: 'Visual Brief', description: 'Панорамный визуал + три тезиса', icon: 'executive', color: 'green' },
-  { id: 'study', name: 'Visual Cards', description: 'Образ, связи и карточки для запоминания', icon: 'study', color: 'peach' },
+  { id: 'research', name: 'Полевой атлас', description: 'Карты, цветовые слои и пометки', icon: 'research', color: 'blue' },
+  { id: 'deep', name: 'Слои смысла', description: 'Схемы связей и пояснения', icon: 'deep', color: 'purple' },
+  { id: 'executive', name: 'Ночной маршрут', description: 'Контрастные карты и тезисы', icon: 'executive', color: 'green' },
+  { id: 'study', name: 'Карточки исследователя', description: 'Вопросы, заметки и ярлыки', icon: 'study', color: 'peach' },
 ] as const;
 export type TemplateId = typeof templates[number]['id'];
 export type SlideType = 'title' | 'insights' | 'analysis' | 'timeline' | 'qa';
