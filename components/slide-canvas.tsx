@@ -1,22 +1,18 @@
 'use client';
-import { ArrowUpRight, BookOpen, BrainCircuit, Layers3, Lightbulb, Orbit, Quote, Sparkles } from 'lucide-react';
-import { Slide, Theme } from '@/lib/types';
-type Props = { slide: Slide; theme: Theme; index: number; total: number; onEdit?: (field: string, value: string) => void; miniature?: boolean };
-export function SlideCanvas({ slide, theme, index, total, onEdit, miniature = false }: Props) {
-  const text = (value: string, field: string, className = '', max = 650) => onEdit && !miniature ? <span className={`editable ${className}`} contentEditable="plaintext-only" suppressContentEditableWarning role="textbox" aria-label={`Редактировать: ${field}`} onBlur={e => { const next = (e.currentTarget.textContent || '').trim().slice(0, max); e.currentTarget.textContent = next || value; if (next && next !== value) onEdit(field, next); }}>{value}</span> : <span className={className}>{value}</span>;
-  const contentLength = slide.items.reduce((n, i) => n + i.title.length + i.body.length, 0);
-  const density = contentLength > 1500 ? 'very-dense' : contentLength > 950 ? 'dense' : '';
-  const icons = [Lightbulb, Layers3, BrainCircuit];
-  return <article className={`slide slide-${slide.type} theme-${theme} ${density} ${slide.title.length > 150 ? 'very-long-title' : slide.title.length > 90 ? 'long-title' : ''} ${miniature ? 'miniature' : ''}`} aria-label={`Слайд ${index + 1}: ${slide.title}`}>
-    <div className="slide-topline"><span><span className="tiny-star">✳</span> SLIDEBOOK <span className="slide-top-divider">/</span> {text(slide.eyebrow, 'eyebrow', '', 80)}</span><span>RESEARCH, MADE CLEAR</span></div>
-    {slide.type === 'title' ? <div className="title-layout"><div className="title-copy"><div className="slide-tags">{slide.tags.map((t, i) => <span key={i}>{text(t, `tags.${i}`, '', 80)}</span>)}</div><h1>{text(slide.title, 'title', '', 180)}</h1><p className="title-subtitle">{text(slide.subtitle, 'subtitle', '', 400)}</p><div className="title-caption"><span className="caption-line"/>{text(slide.takeaway, 'takeaway', '', 240)}</div></div><div className="research-art" aria-hidden="true"><div className="orbit-ring ring-one"/><div className="orbit-ring ring-two"/><div className="art-center"><Orbit/><span>Соединяем<br/>идеи.</span></div><div className="art-note note-top"><span className="note-icon"><Lightbulb/></span><span>Ключевые идеи</span><ArrowUpRight/></div><div className="art-note note-bottom"><span className="note-icon"><BookOpen/></span><span>Новые перспективы</span></div><div className="art-spark"><Sparkles/></div><span className="art-dot dot-one"/><span className="art-dot dot-two"/><span className="art-label">A LITTLE CURIOSITY.<br/>A CLEARER PICTURE.</span></div></div> : <>
-      <header className="slide-heading"><span className="slide-section-label">{text(slide.eyebrow, 'eyebrow', '', 80)}</span><h2>{text(slide.title, 'title', '', 180)}</h2><p>{text(slide.subtitle, 'subtitle', '', 400)}</p></header>
-      {slide.type === 'insights' && <div className="insight-grid">{slide.items.map((item, i) => { const Icon = icons[i % icons.length]; return <section className={`insight-card card-${i}`} key={i}><div className="insight-top"><Icon/><span>0{i + 1}</span></div><h3>{text(item.title, `items.${i}.title`, '', 180)}</h3><p>{text(item.body, `items.${i}.body`)}</p></section>; })}</div>}
-      {slide.type === 'analysis' && <div className="analysis-layout"><div className="analysis-points">{slide.items.map((item, i) => <section key={i}><span className="point-number">0{i + 1}</span><div><h3>{text(item.title, `items.${i}.title`, '', 180)}</h3><p>{text(item.body, `items.${i}.body`)}</p></div></section>)}</div><aside className="takeaway-card"><Quote/><span>KEY TAKEAWAY</span><p>{text(slide.takeaway, 'takeaway')}</p><div className="takeaway-rule"/><small>Связь, которую стоит запомнить</small></aside></div>}
-      {slide.type === 'timeline' && <div className="timeline-layout">{slide.items.map((item, i) => <section key={i}><div className="timeline-marker"><span>0{i + 1}</span><i/></div><h3>{text(item.title, `items.${i}.title`, '', 180)}</h3><p>{text(item.body, `items.${i}.body`)}</p></section>)}</div>}
-      {slide.type === 'qa' && <div className="qa-layout">{slide.items.map((item, i) => <section key={i}><span className="question-number">Q{i + 1}</span><div><h3>{text(item.title, `items.${i}.title`, '', 180)}</h3><p>{text(item.body, `items.${i}.body`)}</p></div><ArrowUpRight/></section>)}</div>}
-      {slide.type !== 'analysis' && <div className="slide-bottom-note"><Sparkles/>{text(slide.takeaway, 'takeaway')}</div>}
-    </>}
-    <footer className="slide-footer"><span>Знания обретают форму.</span><span>{String(index + 1).padStart(2, '0')} <i>/</i> {String(total).padStart(2, '0')}</span></footer>
+import { Slide, Theme, TemplateId } from '@/lib/types';
+import { SlideVisual } from './slide-visual';
+import { concise } from '@/lib/visuals';
+type Props = { slide: Slide; theme: Theme; index: number; total: number; onEdit?: (field: string, value: string) => void; miniature?: boolean; template?: TemplateId; topic?: string };
+export function SlideCanvas({ slide, theme, index, total, onEdit, miniature = false, template = 'research', topic = slide.title }: Props) {
+  const text = (value: string, field: string, max: number) => onEdit && !miniature ? <span className="editable" contentEditable="plaintext-only" suppressContentEditableWarning role="textbox" aria-label={`Редактировать: ${field}`} onBlur={e => { const next = (e.currentTarget.textContent || '').trim().slice(0, max); e.currentTarget.textContent = next || value; if (next && next !== value) onEdit(field, next); }}>{value}</span> : <span>{value}</span>;
+  const long = slide.title.length > 95 ? 'very-long-title' : slide.title.length > 65 ? 'long-title' : '';
+  return <article className={`slide visual-slide slide-${slide.type} layout-${template} theme-${theme} ${long} ${miniature ? 'miniature' : ''}`} data-layout-ratio="60/40" aria-label={`Слайд ${index + 1}: ${slide.title}`}>
+    <SlideVisual slide={slide} topic={topic} template={template}/>
+    <div className="slide-copy" data-zone="text">
+      <div className="slide-topline"><span>SLIDEBOOK / {text(slide.eyebrow,'eyebrow',50)}</span><span>{String(index+1).padStart(2,'0')}</span></div>
+      <div className="slide-copy-heading"><div className="copy-eyebrow">{slide.type === 'title' ? 'ОТ ИДЕИ К ОБРАЗУ' : {insights:'СОЕДИНЯЕМ ГЛАВНОЕ',analysis:'ВИДЕТЬ И ПОНИМАТЬ',timeline:'МАРШРУТ ИДЕИ',qa:'УВИДЕТЬ. ЗАПОМНИТЬ.'}[slide.type]}</div>{slide.type === 'title' ? <h1>{text(slide.title,'title',180)}</h1> : <h2>{text(slide.title,'title',95)}</h2>}<p className="slide-intro">{text(concise(slide.subtitle,115),'subtitle',115)}</p></div>
+      {slide.type === 'title' ? <div className="cover-details"><div className="cover-rule"/><p>{text(concise(slide.takeaway,115),'takeaway',115)}</p><div className="slide-tags">{slide.tags.slice(0,3).map((t,i) => <span key={i}>{text(t,`tags.${i}`,35)}</span>)}</div></div> : <div className="copy-points">{slide.items.map((item,i) => <section key={i}><span className="copy-point-number">0{i+1}</span><div><h3>{text(concise(item.title,46),`items.${i}.title`,46)}</h3><p>{text(concise(item.body,110),`items.${i}.body`,110)}</p></div></section>)}</div>}
+      <footer className="slide-footer"><span>{template === 'study' ? 'Увидеть — значит понять.' : 'Идеи, которые видно.'}</span><span>{String(index+1).padStart(2,'0')} <i>/</i> {String(total).padStart(2,'0')}</span></footer>
+    </div>
   </article>;
 }

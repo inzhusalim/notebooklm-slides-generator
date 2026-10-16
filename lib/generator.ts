@@ -1,3 +1,4 @@
+import { compactDeck } from './visuals';
 import { Deck, Slide, SlideItem, SlideType, TemplateId, templates } from './types';
 
 type Profile = { match: RegExp; label: string; summary: string; tags: string[]; insights: SlideItem[]; mechanism: SlideItem[]; phases: SlideItem[]; qa: SlideItem[]; caution: string };
@@ -127,6 +128,6 @@ export function generateDeck(topicInput: string, template: TemplateId = 'researc
   const shortOrder: Record<TemplateId, number[]> = { research: [0,1,2,3,5], deep: [0,2,1,5,3], executive: [0,1,4,3,5], study: [0,2,5,1,3] };
   const indices = count === 5 ? shortOrder[template] : order[template].slice(0, count);
   const slides = indices.map((n, i) => ({ ...base[n], id: `slide-${i + 1}` }));
-  return { topic, template, slides, mode: 'local', createdAt: new Date().toISOString() };
+  return compactDeck({ topic, template, slides, mode: 'local', createdAt: new Date().toISOString() });
 }
 export const slideSequence = (template: TemplateId, count: number): SlideType[] => generateDeck('Исследование', template, count).slides.map(s => s.type);
